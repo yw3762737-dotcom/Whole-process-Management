@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0c1514">
+  <title>HIBORN｜海本精管项目地图</title>
+  <meta name="description" content="海本精管项目位置索引：全国、西安、项目位置三级地图。">
+  <link rel="preconnect" href="https://tile.openstreetmap.org">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
+  <style>
+    :root{color-scheme:dark;--ink:#edf2ed;--muted:#9baaa2;--gold:#d8bd8b;--line:#ffffff20;--panel:#101b19;--panel2:#13221f;--map:#192724}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#091110;color:var(--ink);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+    button,a{font:inherit}button{color:inherit}a{color:inherit}.top{height:70px;padding:0 clamp(16px,4vw,56px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:#0d1716}
+    .brand{display:flex;flex-direction:column;text-decoration:none;line-height:1}.brand b{font-size:20px;letter-spacing:.04em}.brand small{margin-top:7px;font-size:10px;letter-spacing:.12em;color:#b6c1bb}
+    .top-note{font:10px ui-monospace,monospace;letter-spacing:.18em;color:#96a69d}.top a.back{font-size:12px;color:var(--gold);text-decoration:none}
+    main{max-width:1600px;margin:0 auto;padding:clamp(18px,3vw,42px)}.kicker{font:10px ui-monospace,monospace;letter-spacing:.2em;color:var(--gold)}
+    h1{font-size:clamp(25px,3vw,38px);font-weight:500;letter-spacing:-.03em;margin:12px 0 7px}.lead{margin:0 0 22px;color:#b7c4bc;font-size:13px}
+    .atlas{display:grid;grid-template-columns:minmax(230px,280px) minmax(440px,1fr) minmax(260px,320px);min-height:660px;border:1px solid #465c55;background:var(--panel);box-shadow:0 25px 70px #0005}
+    .intro,.side{padding:24px;min-width:0}.intro{display:flex;flex-direction:column;border-right:1px solid var(--line)}.eyebrow{color:var(--gold);font:10px ui-monospace,monospace;letter-spacing:.18em}.intro h2{font-size:22px;font-weight:500;margin:19px 0 12px}.intro p,.side p{color:#b6c3bc;font-size:12px;line-height:1.85;margin:0 0 13px}
+    .stats{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;padding-top:18px;margin-top:10px;border-top:1px solid var(--line)}.stats b{font-size:25px;font-weight:400;color:var(--gold)}.stats span{font-size:10px;color:var(--muted);grid-row:2}.stats b:nth-of-type(2){grid-column:2;grid-row:1}.stats span:nth-of-type(2){grid-column:2;grid-row:2}
+    .source-note{margin-top:auto!important;padding-top:16px;color:#83958b!important;font-size:10px!important}.center{display:flex;flex-direction:column;min-width:0}.crumbs{height:52px;display:flex;align-items:center;gap:8px;padding:0 14px;border-bottom:1px solid var(--line);color:#788a81;font-size:11px}.crumbs button{border:0;background:none;color:#bdc9c2;padding:5px;cursor:pointer}.crumbs button.active{color:var(--gold)}.crumbs button:disabled{opacity:.42;cursor:default}
+    #map{flex:1;min-height:570px;background:var(--map)}.map-foot{display:flex;justify-content:space-between;gap:8px;padding:11px 14px;border-top:1px solid var(--line);color:#92a198;font-size:9px}.map-foot span:last-child{font-family:ui-monospace,monospace}
+    .side{overflow:auto;border-left:1px solid var(--line)}.side h3{font-size:17px;font-weight:500;margin:15px 0 8px}.side .hint{font-size:10px;color:#94a49b;margin:8px 0 12px}.project-list{display:flex;flex-direction:column}.project{display:grid;grid-template-columns:18px minmax(0,1fr) 12px;align-items:center;gap:9px;width:100%;padding:12px 0;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;cursor:pointer}.project:hover{background:#ffffff08}.project b{font-size:11px;font-weight:500}.project small{display:block;margin-top:4px;color:#98a79f;font-size:9px;line-height:1.5;overflow-wrap:anywhere}.dot{color:var(--gold)}.project.pending .dot{color:#78877f}
+    .detail-grid{margin:17px 0 11px;border-top:1px solid var(--line)}.detail-row{display:grid;grid-template-columns:72px 1fr;gap:8px;padding:10px 0;border-bottom:1px solid var(--line);font-size:10px}.detail-row span:first-child{color:#93a198}.detail-row span:last-child{overflow-wrap:anywhere}.notice{padding:10px;background:#d8bd8b12;border-left:2px solid var(--gold);font-size:10px;color:#d6ddd8!important}.actions{display:flex;flex-wrap:wrap;gap:8px;margin:13px 0}.actions a,.actions button{display:inline-flex;align-items:center;min-height:30px;padding:6px 9px;border:1px solid #ffffff30;background:#ffffff08;color:#e6ece6;text-decoration:none;font-size:9px;cursor:pointer}.actions a:hover,.actions button:hover{border-color:var(--gold);color:var(--gold)}.actions button:disabled{opacity:.4;cursor:not-allowed}
+    .pulse-icon{width:20px;height:20px;position:relative}.pulse-icon:before,.pulse-icon:after{position:absolute;content:"";left:50%;top:50%;border-radius:50%;transform:translate(-50%,-50%)}.pulse-icon:before{width:30px;height:30px;border:1px solid #e4c98e99;box-shadow:0 0 22px 7px #d8bd8b55;animation:pulse 2.4s ease-out infinite}.pulse-icon:after{width:10px;height:10px;background:#fff0c9;border:2px solid white;box-shadow:0 0 12px 5px #eacb8b}
+    .project-icon{height:13px;width:13px;border-radius:50%;background:#f4e1bb;border:2px solid white;box-shadow:0 0 0 7px #d8bd8b33,0 0 18px 4px #e5c587}.project-icon.selected{background:#fff;box-shadow:0 0 0 9px #e4c98e4a,0 0 24px 7px #e5c587}
+    .leaflet-container{font:inherit}.leaflet-control-zoom a{background:#0f1c19!important;color:#eee!important;border-color:#ffffff30!important}.leaflet-control-attribution{background:#0a1311d9!important;color:#c4cec8!important}.leaflet-control-attribution a{color:#ddc58f!important}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#101b19;color:#edf2ed;border:1px solid #ffffff2b;box-shadow:0 8px 30px #0008}.leaflet-popup-content{margin:12px 14px;min-width:150px}.popup-title{font-size:12px;color:#f1d49b}.popup-meta{font-size:10px;color:#aab8b0;margin-top:4px;line-height:1.6}
+    .map-label{padding:3px 7px;border:1px solid #d8bd8b66;background:#0d1917e8;color:#f0d7a7;border-radius:2px;font-size:10px;white-space:nowrap;box-shadow:0 4px 14px #0008}.leaflet-tooltip:before{display:none}
+    .loading{position:absolute;z-index:500;top:16px;left:50%;transform:translateX(-50%);padding:6px 9px;background:#0c1714df;color:#e3e9e4;border:1px solid #ffffff24;font-size:9px;pointer-events:none}
+    footer{max-width:1600px;margin:16px auto 0;padding:16px clamp(18px,3vw,42px) 32px;color:#7f9087;font-size:10px;display:flex;justify-content:space-between;gap:12px}footer a{color:#b9c4bd}
+    @keyframes pulse{0%{opacity:.85;transform:translate(-50%,-50%) scale(.55)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.7)}}
+    @media(max-width:1000px){.atlas{grid-template-columns:230px minmax(380px,1fr)}.side{grid-column:1/-1;border:0;border-top:1px solid var(--line);max-height:340px}.intro{border-right:0}#map{min-height:500px}}
+    @media(max-width:650px){.top{height:60px}.top-note{display:none}main{padding:18px 12px}.atlas{display:flex;flex-direction:column}.center{order:0}.intro{order:1;border:0;border-top:1px solid var(--line);padding:18px}.side{order:2;padding:18px;max-height:440px}.crumbs{height:46px}#map{height:56vh;min-height:360px;flex:none}.intro h2{margin:10px 0}.source-note{margin-top:7px!important}.map-foot{font-size:8px}footer{padding:16px 14px 28px;flex-wrap:wrap}}
+  </style>
+</head>
+<body>
+  <header class="top"><a class="brand" href="https://yw3762737-dotcom.github.io/Whole-process-Management/"><b>HIBORN</b><small>高标装修全过程管理</small></a><span class="top-note">PROJECT LOCATION INDEX / 2026</span><a class="back" href="https://yw3762737-dotcom.github.io/Whole-process-Management/">全过程管理 ↗</a></header>
+  <main>
+    <span class="kicker">HIBORN / PROJECT ATLAS</span><h1>项目位置索引</h1><p class="lead">从全国项目分布，到西安落点，再到单个项目位置。地图点位对应公开小区地标，宗地红线以正式资料核定。</p>
+    <section class="atlas" aria-label="项目三级地图">
+      <aside class="intro" id="intro"></aside>
+      <div class="center"><nav class="crumbs" id="crumbs" aria-label="地图层级"></nav><div id="map" role="application" aria-label="项目地图"><div class="loading" id="loading">正在载入在线地图…</div></div><div class="map-foot"><span id="map-caption">中国项目分布</span><span>01 CHINA / 02 XI’AN / 03 PROJECT</span></div></div>
+      <aside class="side" id="side"></aside>
+    </section>
+  </main>
+  <footer><span>HIBORN · 海本精管</span><span>地图底图 © OpenStreetMap contributors</span><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">数据说明 ↗</a></footer>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+  <script>
+  (function(){
+    'use strict';
+    var projects=[
+      {id:'heyuan',name:'曲江公馆·和园',kind:'高文安老师项目',summary:'大尺度空间、玻璃构造与精细收口的协同落地。',photos:7,lat:34.2076896,lng:108.9859586,source:'https://www.openstreetmap.org/search?query='+encodeURIComponent('曲江公馆和园 西安')},
+      {id:'source',name:'源邸壹号 · 260㎡',kind:'住宅项目',summary:'原香港 CCD 合伙人刘力硕老师项目。',photos:1,address:'西安浐灞国际港，浐河西路北段 6888 号／欧亚大道附近',source:'https://www.fang.com/xiaoqu/xian-3610191674/'},
+      {id:'tanfu',name:'泰发祥·檀府 · 330㎡',kind:'无间设计吴滨老师项目',summary:'样板间实景，关注设计意图与现场工艺的一致性。',photos:1,lat:34.2099502,lng:108.9575103,source:'https://www.openstreetmap.org/search?query='+encodeURIComponent('泰发祥檀府 西安')},
+      {id:'changanxi',name:'航天城招商长安玺',kind:'高端住宅',summary:'项目案例与住宅施工管理。',photos:6,address:'西安航天基地，航腾路与航新路交叉口南侧',source:'https://xian.esf.fang.com/loupan/3610192470/housedetail.htm'},
+      {id:'yuexi',name:'曲江华润悦玺',kind:'高端住宅',summary:'曲江片区住宅项目。',photos:5,lat:34.1979614,lng:108.9473532,source:'https://www.openstreetmap.org/search?query='+encodeURIComponent('曲江华润悦玺 西安')},
+      {id:'jintai',name:'金泰唐618',kind:'高端住宅',summary:'雁塔片区住宅项目。',photos:5,address:'西安雁塔区，雁翔路以东；西影路与新安路附近',source:'https://www.sxjthy.com/project?id=28'},
+      {id:'fenghua',name:'沣华熙城',kind:'高端住宅',summary:'沣东片区项目。',photos:5,lat:34.2582085,lng:108.7737943,source:'https://www.openstreetmap.org/search?query='+encodeURIComponent('沣华熙城 西安')},
+      {id:'huazhu',name:'曲江华著中城',kind:'高端住宅',summary:'曲江片区住宅项目。',photos:6,lat:34.2170095,lng:108.9954461,source:'https://www.openstreetmap.org/search?query='+encodeURIComponent('曲江华著中城 西安')},
+      {id:'rongmin',name:'高新荣民捌号',kind:'高端住宅',summary:'高新片区住宅项目。',photos:6,lat:34.2290295,lng:108.8691626,source:'https://www.openstreetmap.org/search?query='+encodeURIComponent('荣民捌号 西安')}
+    ];
+    var stage='china',selected='',map=null,layer=null,projectMarkers={},boundaryGroup=null,drawControl=null;
+    var boundaryKey='hiborn-atlas-boundaries-v1';
+    var $=function(sel){return document.querySelector(sel)};
+    var esc=function(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+    var mapped=function(){return projects.filter(function(p){return Number.isFinite(p.lat)&&Number.isFinite(p.lng)})};
+    var current=function(){return projects.find(function(p){return p.id===selected})};
+    var loc=function(p){return p.address||(p.lat?'西安市 · '+p.name+'（公开小区地标）':'西安市 · '+(p.kind||'项目地址待核对'))};
+    var amap=function(p){return 'https://uri.amap.com/search?'+new URLSearchParams({keyword:p.address||p.name,city:'西安',view:'map',src:'hiborn-project-atlas'})};
+    function saved(){try{return JSON.parse(localStorage.getItem(boundaryKey)||'{}')}catch(_){return {}}}
+    function render(){
+      var p=current(),crumb=$('#crumbs'),intro=$('#intro'),side=$('#side');
+      crumb.innerHTML='<button data-stage="china" class="'+(stage==='china'?'active':'')+'">中国</button><span>／</span><button data-stage="city" class="'+(stage==='city'?'active':'')+'" '+(stage==='china'?'disabled':'')+'>西安</button><span>／</span><button class="'+(stage==='detail'?'active':'')+'" disabled>'+(stage==='detail'&&p?esc(p.name):'项目位置')+'</button>';
+      if(stage==='china'){
+        intro.innerHTML='<span class="eyebrow">NATIONAL OVERVIEW</span><h2>中国项目分布</h2><p>项目案例当前集中在陕西西安。将鼠标移至发光点查看项目概况，点击进入西安项目地图。</p><div class="stats"><b>'+projects.length+'</b><span>项目档案</span><b>'+mapped().length+'</b><span>已核对公开地标</span></div><p class="source-note">项目坐标为公开小区级位置索引，不代表楼栋、住宅单元或施工宗地。在线地图需要网络连接。</p>';
+        side.innerHTML='<span class="eyebrow">XI’AN / '+projects.length+' PROJECTS</span><h3>西安项目集群</h3><p>点地图上的西安标记进入城市视图；再选择单个项目查看位置详情。</p><div class="project-list">'+projects.map(function(x,i){return '<button class="project '+(x.lat?'':'pending')+'" data-project="'+x.id+'"><span class="dot">'+(x.lat?'●':'＋')+'</span><span><b>'+esc(x.name)+'</b><small>'+esc(x.lat?'公开小区地标 · '+x.photos+' 张案例照片':loc(x)+' · 待核实坐标')+'</small></span><span>↗</span></button>'}).join('')+'</div>';
+        $('#map-caption').textContent='中国项目分布 · 发光点代表西安';
+      }else if(stage==='city'){
+        intro.innerHTML='<span class="eyebrow">CITY OVERVIEW</span><h2>西安项目地图</h2><p>点位落在公开地图可核对的小区地标上。悬停查看项目摘要，点击查看单项位置和地块资料。</p><div class="stats"><b>'+projects.length+'</b><span>项目档案</span><b>'+mapped().length+'</b><span>已定位地标</span></div><p class="source-note">其他项目在右侧保留名称与地址；地址搜索结果尚未人工确认前，不放置地图标记。</p>';
+        side.innerHTML='<span class="eyebrow">PROJECT INDEX</span><h3>西安 · '+projects.length+' 个项目</h3><p class="hint">点击项目查看位置详情。无坐标项可打开地图检索并核对。</p><div class="project-list">'+projects.map(function(x,i){return '<button class="project '+(x.lat?'':'pending')+'" data-project="'+x.id+'"><span class="dot">'+(x.lat?'●':'＋')+'</span><span><b>'+esc(x.name)+'</b><small>'+esc(x.lat?'公开小区地标 · '+x.photos+' 张照片':loc(x)+' · 坐标待确认')+'</small></span><span>↗</span></button>'}).join('')+'</div>';
+        $('#map-caption').textContent='西安 · '+mapped().length+' 个公开小区地标 / '+projects.length+' 个项目档案';
+      }else{
+        var has=!!saved()[selected],latText=p&&Number.isFinite(p.lat)?p.lat.toFixed(6)+'°N, '+p.lng.toFixed(6)+'°E':'准确坐标待核实';
+        intro.innerHTML='<span class="eyebrow">PROJECT LOCATION</span><h2>'+esc(p?p.name:'项目位置')+'</h2><p>'+esc(p?p.summary:'项目地址资料待补充。')+'</p><div class="stats"><b>'+((p&&p.photos)||0)+'</b><span>案例照片</span><b>'+(p&&p.lat?'已核对':'待确认')+'</b><span>地图坐标</span></div><p class="source-note">项目地标代表公开小区位置。宗地轮廓需要项目方提供或确认的红线图、总平坐标后再录入。</p>';
+        side.innerHTML='<span class="eyebrow">PROJECT / '+(p&&p.lat?'LOCATION':'ADDRESS')+'</span><h3>'+esc(p?p.name:'项目')+'</h3><p>'+esc(p?p.summary:'')+'</p><div class="detail-grid"><div class="detail-row"><span>公开位置</span><span>'+esc(p?loc(p):'待补充')+'</span></div><div class="detail-row"><span>地图坐标</span><span>'+esc(latText)+'</span></div><div class="detail-row"><span>宗地轮廓</span><span>'+(has?'已在本机浏览器绘制':'待正式红线资料')+'</span></div></div><p class="notice">'+(has?'轮廓保存在当前浏览器，仍须与项目正式红线核对。':'当前没有经项目方确认的宗地边界，地图标记仅表示小区公开地标。')+'</p><div class="actions"><a href="'+esc(amap(p||{}))+'" target="_blank" rel="noopener">高德检索 ↗</a><a href="'+esc(p&&p.source||'#')+'" target="_blank" rel="noopener">位置来源 ↗</a><button id="draw-boundary" '+(p&&p.lat?'':'disabled')+'>'+(has?'重绘轮廓':'绘制轮廓')+'</button></div>';
+        $('#map-caption').textContent=(p?p.name:'项目位置')+' · '+(p&&p.lat?'公开地标坐标':'地图落点待核实');
+      }
+    }
+    function popup(p){return '<div class="popup-title">'+esc(p.name)+'</div><div class="popup-meta">'+esc(p.kind)+'<br>'+esc(p.summary)+'<br>'+p.photos+' 张案例照片 · 点击查看位置</div>'}
+    function clearLayers(){if(layer){layer.remove();layer=null}projectMarkers={};if(boundaryGroup){boundaryGroup.remove();boundaryGroup=null}}
+    function icon(html){return L.divIcon({className:'',html:html,iconSize:null,iconAnchor:[10,10]})}
+    function enterCity(){stage='city';selected='';render();syncMap()}
+    function enterDetail(id){stage='detail';selected=id;render();syncMap()}
+    function syncMap(){
+      if(!map)return;clearLayers();
+      if(stage==='china'){
+        map.setView([35.9,104.2],4,{animate:true});
+        var china=L.marker([34.3416,108.9398],{icon:icon('<div class="pulse-icon"></div>'),keyboard:true,title:'西安 · '+projects.length+' 个项目'}).addTo(map);
+        china.bindTooltip('<div class="popup-title">西安 · '+projects.length+' 个项目</div><div class="popup-meta">'+mapped().length+' 个公开小区地标已核对<br>案例：'+projects.slice(0,3).map(function(p){return esc(p.name)}).join(' · ')+' 等<br>点击进入西安项目地图</div>',{direction:'top',offset:[0,-10],opacity:1,sticky:true});
+        china.on('click',enterCity);
+        layer=L.layerGroup([china]).addTo(map);
+      }else if(stage==='city'){
+        map.setView([34.22,108.91],10,{animate:true});layer=L.layerGroup().addTo(map);
+        mapped().forEach(function(p){var mark=L.marker([p.lat,p.lng],{icon:icon('<div class="project-icon"></div>'),title:p.name,keyboard:true}).addTo(layer);mark.bindTooltip(popup(p),{direction:'top',offset:[0,-8],sticky:true});mark.on('click',function(){enterDetail(p.id)});projectMarkers[p.id]=mark});
+        var group=L.featureGroup(Object.values(projectMarkers));if(Object.keys(projectMarkers).length)map.fitBounds(group.getBounds().pad(.18),{maxZoom:11,animate:true});
+      }else{
+        var p=current();if(p&&p.lat){map.setView([p.lat,p.lng],16,{animate:true});layer=L.layerGroup().addTo(map);var mark=L.marker([p.lat,p.lng],{icon:icon('<div class="project-icon selected"></div>'),title:p.name}).addTo(layer);mark.bindTooltip(p.name,{permanent:true,direction:'top',offset:[0,-8],className:'map-label'});mark.bindPopup(popup(p));projectMarkers[p.id]=mark}else{map.setView([34.3416,108.9398],12,{animate:true});layer=L.layerGroup().addTo(map)}
+        boundaryGroup=L.featureGroup().addTo(map);var savedData=saved()[selected];if(savedData&&savedData.type==='FeatureCollection')L.geoJSON(savedData,{style:{color:'#e4bd76',weight:3,fillColor:'#d9b875',fillOpacity:.18}}).eachLayer(function(l){boundaryGroup.addLayer(l)});
+      }
+      var loading=$('#loading');if(loading)loading.remove();
+    }
+    function hoverProject(id){var p=projects.find(function(x){return x.id===id});if(!p)return;if(stage==='city'&&projectMarkers[id])projectMarkers[id].openTooltip();else if(stage==='china'){map.closeTooltip();L.tooltip({direction:'top',sticky:true}).setLatLng([34.3416,108.9398]).setContent(popup(p)).openOn(map)}}
+    document.addEventListener('click',function(e){var s=e.target.closest('[data-stage]'),p=e.target.closest('[data-project]');if(s){stage=s.dataset.stage;if(stage!=='detail')selected='';render();syncMap();return}if(p){enterDetail(p.dataset.project);return}if(e.target.closest('#draw-boundary')){if(!window.L.Draw){alert('边界绘制工具加载失败，请刷新后重试。');return}if(!drawControl){drawControl=new L.Control.Draw({draw:{polyline:false,rectangle:false,circle:false,circlemarker:false,marker:false,polygon:{allowIntersection:false,showArea:true,shapeOptions:{color:'#e4bd76',weight:3,fillColor:'#d9b875',fillOpacity:.18}}},edit:{featureGroup:boundaryGroup}});map.addControl(drawControl)}return}});
+    document.addEventListener('mouseover',function(e){var p=e.target.closest('[data-project]');if(p)hoverProject(p.dataset.project)});
+    document.addEventListener('mouseout',function(e){var p=e.target.closest('[data-project]');if(p&&stage==='china')map.closeTooltip()});
+    if(!window.L){$('#loading').textContent='在线地图组件加载失败；请检查网络后刷新。';return}
+    map=L.map('map',{zoomControl:true,scrollWheelZoom:true}).setView([35.9,104.2],4);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'}).addTo(map);
+    if(L.Draw)map.on(L.Draw.Event.CREATED,function(e){boundaryGroup.clearLayers();boundaryGroup.addLayer(e.layer);var all=saved();all[selected]=e.layer.toGeoJSON();localStorage.setItem(boundaryKey,JSON.stringify(all));render();syncMap()});
+    render();syncMap();
+  })();
+  </script>
+</body>
+</html>
