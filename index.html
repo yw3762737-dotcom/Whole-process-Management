@@ -613,7 +613,10 @@ document.getElementById('theme').onclick=()=>{S.theme=S.theme==='dark'?'light':'
   function summary(p){
     return '<strong>'+esc(p.title)+'</strong><p>'+esc(p.summary||p.type||'海本精管落地项目')+'</p><small>'+esc(p.type||'项目案例')+' · '+((p.photos||[]).length)+' 张实景照片</small>';
   }
-  function markerHtml(extra){return '<div class="hiborn-map-pin '+(extra||'')+'" aria-hidden="true"></div>'}
+  function markerHtml(extra,target){
+    var action=target==='city'?' data-atlas-level="city"':target?' data-atlas-project="'+esc(target)+'"':'';
+    return '<div class="hiborn-map-pin '+(extra||'')+'"'+action+' aria-hidden="true"></div>';
+  }
   function renderOffline(host,status,entries){
     var selected=entries.find(function(p){return keyOf(p)===atlasSelected}),mapped=entries.filter(function(p){return verify(p)}),svg='',boundaries=readBoundaries();
     if(atlasLevel==='china'){
@@ -671,12 +674,12 @@ document.getElementById('theme').onclick=()=>{S.theme=S.theme==='dark'?'light':'
       atlasMap=new AMap.Map(host,{zoom:zoom,center:center,viewMode:'2D',mapStyle:'amap://styles/dark',showLabel:true});
       document.getElementById('map-fallback')&&document.getElementById('map-fallback').remove();
       if(level==='china'){
-        var marker=new AMap.Marker({position:xiAn,title:'西安 · '+entries.length+' 个项目',content:markerHtml('city'),offset:new AMap.Pixel(-7,-7),zIndex:100});
+        var marker=new AMap.Marker({position:xiAn,title:'西安 · '+entries.length+' 个项目',content:markerHtml('city','city'),offset:new AMap.Pixel(-7,-7),zIndex:100});
         atlasMap.add(marker);showInfo(atlasMap,marker,'<strong>西安 · '+entries.length+' 个项目</strong><p>海本精管的实景项目与落地服务集中在西安。</p><small>点击进入西安地图 →</small>');marker.on('click',function(){go('city')});
       }else if(level==='city'){
         mapped.forEach(function(p){
           var pos=mapPosition(p);
-          var marker=new AMap.Marker({position:pos,title:p.title,content:markerHtml('project'),offset:new AMap.Pixel(-6,-6)});
+          var marker=new AMap.Marker({position:pos,title:p.title,content:markerHtml('project',keyOf(p)),offset:new AMap.Pixel(-6,-6)});
           atlasMap.add(marker);showInfo(atlasMap,marker,summary(p));marker.on('click',function(){go('detail',keyOf(p))});
         });
         atlasMap.setFitView(atlasMap.getAllOverlays(),false,[80,230,80,80]);
@@ -706,6 +709,8 @@ document.getElementById('theme').onclick=()=>{S.theme=S.theme==='dark'?'light':'
   window.atlas=atlas;
   window.mountAmap=mountAmap;
   document.addEventListener('click',function(e){
+    var mapPoint=e.target.closest&&e.target.closest('.hiborn-map-pin[data-atlas-level],.hiborn-map-pin[data-atlas-project]');
+    if(mapPoint){e.preventDefault();e.stopPropagation();var level=mapPoint.getAttribute('data-atlas-level'),id=mapPoint.getAttribute('data-atlas-project');if(level)go(level);else if(id)go('detail',id);return}
     var level=e.target.closest('[data-atlas-level]'),item=e.target.closest('[data-atlas-project]'),action=e.target.closest('[data-atlas-action]');
     if(level){e.preventDefault();go(level.getAttribute('data-atlas-level'));return}
     if(item){e.preventDefault();var id=item.getAttribute('data-atlas-project');go('detail',id);return}
@@ -727,7 +732,7 @@ document.getElementById('theme').onclick=()=>{S.theme=S.theme==='dark'?'light':'
         if(window.toast)toast('在地图上逐点勾出地块边界，双击结束');
       });
     }
-  });
+  },true);
   document.addEventListener('keydown',function(e){if(e.key!=='Enter'&&e.key!==' ')return;var el=e.target.closest&&e.target.closest('g[data-atlas-level],g[data-atlas-project]');if(el){e.preventDefault();el.click()}});
   if(window.location.hash.split('/')[0]==='#projects'&&window.draw)window.draw();
 })();
