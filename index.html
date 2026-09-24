@@ -206,16 +206,18 @@ body.cover-mode .icon-button{color:#fff;border-color:#ffffff55}
   font-size:11px;line-height:1.5;pointer-events:none;
 }
 .hiborn-map-pin{
-  padding:7px 10px;border:1px solid #f4e8ce;
-  border-radius:3px;background:#d8b981;color:#11211c;
-  box-shadow:0 3px 14px #0009;
-  font:600 11px/1.2 -apple-system,BlinkMacSystemFont,"Microsoft YaHei",sans-serif;
-  white-space:nowrap;cursor:pointer;
+  position:relative;width:12px;height:12px;box-sizing:border-box;
+  border:2px solid #fff8e7;border-radius:50%;
+  background:#f5e3bf;box-shadow:0 0 0 4px #e7c78335,0 0 13px 5px #e8c276a6;
+  cursor:pointer;animation:hiborn-point-breathe 2.6s ease-in-out infinite;
 }
 .hiborn-map-pin::before{
-  content:"";display:inline-block;width:6px;height:6px;border-radius:50%;
-  background:#15332b;margin-right:6px;vertical-align:2px;
+  content:"";position:absolute;inset:-9px;border:1px solid #f0d39c75;
+  border-radius:50%;background:#e9c77a13;pointer-events:none;
 }
+.hiborn-map-pin.project{width:10px;height:10px;box-shadow:0 0 0 4px #e7c78328,0 0 11px 4px #e8c27696}
+.hiborn-map-pin.selected{width:14px;height:14px}
+@keyframes hiborn-point-breathe{50%{box-shadow:0 0 0 6px #e7c78318,0 0 17px 7px #e8c276c2}}
 
 /* 参考演示的运动是四排面板在同一水平轴线的前后环流，而非平面椭圆或单块自转。 */
 .cover-stage .cinematic-art{
@@ -493,7 +495,7 @@ function mountAmap(){
       const mark=(p,coordinates,label)=>{
         if(!host.isConnected||amapMap!==map)return;
         const marker=new AMap.Marker({position:coordinates,title:p.title,
-          content:`<div class="hiborn-map-pin"><span>${E(p.title)}</span></div>`});
+          content:'<div class="hiborn-map-pin project" aria-hidden="true"></div>',offset:new AMap.Pixel(-6,-6)});
         map.add(marker);markers.push(marker);
         marker.on('click',()=>location.hash='#'+route(p));
         poiCache.set(p.key||p.id,{coordinates,label});
@@ -610,13 +612,13 @@ document.getElementById('theme').onclick=()=>{S.theme=S.theme==='dark'?'light':'
   function summary(p){
     return '<strong>'+esc(p.title)+'</strong><p>'+esc(p.summary||p.type||'海本精管落地项目')+'</p><small>'+esc(p.type||'项目案例')+' · '+((p.photos||[]).length)+' 张实景照片</small>';
   }
-  function markerHtml(label,extra){return '<div class="hiborn-map-pin '+(extra||'')+'"><i></i><span>'+esc(label)+'</span></div>'}
+  function markerHtml(extra){return '<div class="hiborn-map-pin '+(extra||'')+'" aria-hidden="true"></div>'}
   function renderOffline(host,status,entries){
     var selected=entries.find(function(p){return keyOf(p)===atlasSelected}),mapped=entries.filter(function(p){return verify(p)}),svg='',boundaries=readBoundaries();
     if(atlasLevel==='china'){
-      svg='<svg viewBox="0 0 1000 560" role="img" aria-label="离线中国项目地图"><defs><radialGradient id="cnGlow"><stop stop-color="#fff0c7"/><stop offset=".24" stop-color="#d7ad69" stop-opacity=".8"/><stop offset="1" stop-color="#d7ad69" stop-opacity="0"/></radialGradient></defs><path class="offline-country-shape" d="M140 190 L190 145 260 135 305 110 362 128 402 95 472 110 511 145 575 133 619 170 689 166 726 195 774 201 801 232 850 245 844 279 810 296 785 323 746 324 712 351 675 341 653 378 616 384 593 419 544 427 515 397 478 405 444 385 400 401 368 371 331 386 299 355 264 352 243 321 208 317 195 282 159 260 151 224Z"/><text x="470" y="250" class="offline-map-label">中国</text><g class="offline-glow" data-atlas-level="city" role="button" tabindex="0" aria-label="进入西安地图"><circle class="glow-halo" cx="515" cy="310" r="42"/><circle class="glow-core" cx="515" cy="310" r="8"/><text x="538" y="315">西安 · '+entries.length+' 项目</text></g></svg>';
+      svg='<svg viewBox="0 0 1000 560" role="img" aria-label="离线中国项目地图"><defs><radialGradient id="cnGlow"><stop stop-color="#fff0c7"/><stop offset=".24" stop-color="#d7ad69" stop-opacity=".8"/><stop offset="1" stop-color="#d7ad69" stop-opacity="0"/></radialGradient></defs><path class="offline-country-shape" d="M140 190 L190 145 260 135 305 110 362 128 402 95 472 110 511 145 575 133 619 170 689 166 726 195 774 201 801 232 850 245 844 279 810 296 785 323 746 324 712 351 675 341 653 378 616 384 593 419 544 427 515 397 478 405 444 385 400 401 368 371 331 386 299 355 264 352 243 321 208 317 195 282 159 260 151 224Z"/><text x="470" y="250" class="offline-map-label">中国</text><g class="offline-glow" data-atlas-level="city" role="button" tabindex="0" aria-label="进入西安地图"><title>西安 · '+entries.length+' 个项目 · 点击进入西安地图</title><circle class="glow-halo" cx="515" cy="310" r="42"/><circle class="glow-core" cx="515" cy="310" r="8"/></g></svg>';
     }else if(atlasLevel==='city'){
-      var points=mapped.map(function(p){var q=verify(p),lng=Array.isArray(q)?q[0]:q.lng,lat=Array.isArray(q)?q[1]:q.lat,xy=xyFor(lng,lat),x=xy[0],y=xy[1];return '<g class="offline-project-point" data-atlas-project="'+esc(keyOf(p))+'" role="button" tabindex="0"><title>'+esc(p.title+' · '+(poiOf(p).name||''))+'</title><circle class="glow-halo" cx="'+x+'" cy="'+y+'" r="23"/><circle class="glow-core" cx="'+x+'" cy="'+y+'" r="6"/><text x="'+(x+15)+'" y="'+(y-12)+'">'+esc(p.title)+'</text></g>'}).join('');
+      var points=mapped.map(function(p){var q=verify(p),lng=Array.isArray(q)?q[0]:q.lng,lat=Array.isArray(q)?q[1]:q.lat,xy=xyFor(lng,lat),x=xy[0],y=xy[1];return '<g class="offline-project-point" data-atlas-project="'+esc(keyOf(p))+'" role="button" tabindex="0"><title>'+esc(p.title+' · '+(poiOf(p).name||''))+'</title><circle class="glow-halo" cx="'+x+'" cy="'+y+'" r="23"/><circle class="glow-core" cx="'+x+'" cy="'+y+'" r="6"/></g>'}).join('');
       svg='<svg viewBox="0 0 1000 560" role="img" aria-label="离线西安项目地图"><rect width="1000" height="560" fill="#182321"/><path class="offline-roads" d="M0 150 C200 120 280 210 410 170 S720 145 1000 190 M0 350 C190 290 360 380 530 330 S790 300 1000 360 M220 0 C250 150 200 350 260 560 M490 0 C450 170 550 350 500 560 M760 0 C700 160 800 350 720 560"/><text x="38" y="48" class="offline-map-label">西安 · '+mapped.length+' 处已核对小区地标</text>'+points+'<text x="38" y="528" class="offline-map-sub">地标来自公开地图；未核实坐标的项目显示在右侧地址索引。</text></svg>';
     }else{
       var pp=selected&&verify(selected),coord=pp?(pp[1]).toFixed(6)+'°N, '+(pp[0]).toFixed(6)+'°E':'项目地址已记录 · 准确落点待核对',shape=pp?outlineSvg(boundaries[atlasSelected],pp):'';
@@ -668,18 +670,18 @@ document.getElementById('theme').onclick=()=>{S.theme=S.theme==='dark'?'light':'
       atlasMap=new AMap.Map(host,{zoom:zoom,center:center,viewMode:'2D',mapStyle:'amap://styles/dark',showLabel:true});
       document.getElementById('map-fallback')&&document.getElementById('map-fallback').remove();
       if(level==='china'){
-        var marker=new AMap.Marker({position:xiAn,content:markerHtml('西安 · '+entries.length+' 项目','city'),offset:new AMap.Pixel(-40,-20),zIndex:100});
+        var marker=new AMap.Marker({position:xiAn,title:'西安 · '+entries.length+' 个项目',content:markerHtml('city'),offset:new AMap.Pixel(-7,-7),zIndex:100});
         atlasMap.add(marker);showInfo(atlasMap,marker,'<strong>西安 · '+entries.length+' 个项目</strong><p>海本精管的实景项目与落地服务集中在西安。</p><small>点击进入西安地图 →</small>');marker.on('click',function(){go('city')});
       }else if(level==='city'){
         mapped.forEach(function(p){
           var pos=mapPosition(p);
-          var marker=new AMap.Marker({position:pos,content:markerHtml(p.title,'project'),offset:new AMap.Pixel(-6,-14)});
+          var marker=new AMap.Marker({position:pos,title:p.title,content:markerHtml('project'),offset:new AMap.Pixel(-6,-6)});
           atlasMap.add(marker);showInfo(atlasMap,marker,summary(p));marker.on('click',function(){go('detail',keyOf(p))});
         });
         atlasMap.setFitView(atlasMap.getAllOverlays(),false,[80,230,80,80]);
       }else if(selected&&loc){
         var pos=mapPosition(selected);
-        var marker=new AMap.Marker({position:pos,content:markerHtml(poiOf(selected).name||selected.title,'selected'),offset:new AMap.Pixel(-6,-14),zIndex:120});
+        var marker=new AMap.Marker({position:pos,title:poiOf(selected).name||selected.title,content:markerHtml('selected'),offset:new AMap.Pixel(-7,-7),zIndex:120});
         atlasMap.add(marker);
         var boundaries={};try{boundaries=JSON.parse(localStorage.getItem(ATLAS_BOUNDARY_KEY)||'{}')}catch(_){}
         if(Array.isArray(boundaries[keyOf(selected)])&&boundaries[keyOf(selected)].length>2){
