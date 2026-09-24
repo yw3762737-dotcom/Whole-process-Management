@@ -604,9 +604,10 @@ document.getElementById('theme').onclick=()=>{S.theme=S.theme==='dark'?'light':'
     return '<section class="atlas atlas-v3" aria-label="'+esc(title)+'"><div class="atlas-intro">'+info+stats+'<small class="atlas-source-note">地标用于项目索引，不代表楼栋或宗地边界。在线地图需联网；离线版内置坐标和名称，可打开浏览。</small></div><div class="atlas-center">'+crumb+'<div class="atlas-canvas"><div id="amap"></div><div class="atlas-live-status" id="atlas-status">正在准备地图…</div></div><div class="atlas-map-caption"><span>'+esc(title)+'</span><span>01 中国　／　02 西安　／　03 项目位置</span></div></div><aside class="atlas-list">'+right+'</aside></section>';
   }
   function showInfo(map,marker,html){
-    var info=new AMap.InfoWindow({isCustom:true,offset:new AMap.Pixel(0,-20),content:'<div class="atlas-popup">'+html+'</div>'});
+    var info=new AMap.InfoWindow({isCustom:true,offset:new AMap.Pixel(0,-20),content:'<div class="atlas-popup" style="pointer-events:none">'+html+'</div>'});
     marker.on('mouseover',function(e){info.open(map,e.target.getPosition())});
     marker.on('mouseout',function(){info.close()});
+    marker.on('click',function(){info.close()});
     return info;
   }
   function summary(p){
