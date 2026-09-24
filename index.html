@@ -343,13 +343,13 @@ function heading(k,h,p='',actions=''){return `<div class="page-head"><div><span 
 function card(p){return `<a class="case-card" href="#${route(p)}"><div class="case-image">${p.cover||p.photos?.[0]?`<img src="${p.cover||p.photos[0]}" alt="${E(p.title)}实景" loading="lazy">`:'<div class="no-photo">项目档案</div>'}</div><div class="case-info"><div class="case-meta"><span>${known.includes(p)?'HIBORN / 实景项目':'LOCAL / 我的项目'}</span><span>${p.photos?.length||0} 张照片 ↗</span></div><h3>${E(p.title)}</h3><p>${E(p.type||p.city||'资料待补充')}</p></div></a>`}
 const story=[
   {label:'01 / HIBORN CRAFT',title:'让设计，<br>不只停留在效果图里。',detail:'海本精管，专注高标装修全过程管理。以深化设计为前置、项目精管为主线、精工施工为结果。'},
-  {label:'02 / CORE CAPABILITIES',title:'从设计意图，<br>到真实生活。',detail:'设计深化 · 项目统筹 · 精工落地 · 交付维护'}
+  {label:'02 / CORE CAPABILITIES',title:'从设计意图，<br>到真实生活。',detail:'设计深化 · 项目统筹 · 精工落地 · 专业工具'}
 ];
 const capabilities=[
-  ['flow','设计深化','把图纸、材料与关键节点先讲清楚。'],
+  ['library','设计深化','把图纸、材料与关键节点先讲清楚。'],
   ['projects','项目精管','让专业协同、进度和责任可追溯。'],
-  ['library','精工落地','以图纸和现场证据核对施工结果。'],
-  ['tools','交付维护','将验收与长期使用纳入全过程。']
+  ['outcomes','精工落地','以图纸和现场证据核对施工结果。'],
+  ['tools','专业工具','给排水诊断、施工前确认与全过程协作工具。']
 ];
 function cinematic(){
   const x=story[intro],second=intro===1;
