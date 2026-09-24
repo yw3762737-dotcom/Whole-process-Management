@@ -709,10 +709,18 @@ document.getElementById('theme').onclick=()=>{S.theme=S.theme==='dark'?'light':'
   }
   window.atlas=atlas;
   window.mountAmap=mountAmap;
-  document.addEventListener('click',function(e){
+  function activateMapPoint(e){
     var mapPoint=e.target.closest&&e.target.closest('.hiborn-map-pin[data-atlas-level],.hiborn-map-pin[data-atlas-project]');
     if(!mapPoint&&e.target.closest){var markerOverlay=e.target.closest('.amap-marker');mapPoint=markerOverlay&&markerOverlay.querySelector('.hiborn-map-pin[data-atlas-level],.hiborn-map-pin[data-atlas-project]')}
-    if(mapPoint){e.preventDefault();e.stopPropagation();var level=mapPoint.getAttribute('data-atlas-level'),id=mapPoint.getAttribute('data-atlas-project');if(level)go(level);else if(id)go('detail',id);return}
+    if(!mapPoint)return false;
+    e.preventDefault();e.stopPropagation();
+    var level=mapPoint.getAttribute('data-atlas-level'),id=mapPoint.getAttribute('data-atlas-project');
+    if(level)go(level);else if(id)go('detail',id);
+    return true;
+  }
+  document.addEventListener('pointerdown',activateMapPoint,true);
+  document.addEventListener('click',function(e){
+    if(activateMapPoint(e))return;
     var level=e.target.closest('[data-atlas-level]'),item=e.target.closest('[data-atlas-project]'),action=e.target.closest('[data-atlas-action]');
     if(level){e.preventDefault();go(level.getAttribute('data-atlas-level'));return}
     if(item){e.preventDefault();var id=item.getAttribute('data-atlas-project');go('detail',id);return}
